@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Web Upload</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="icon" href="img/favicon.svg">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+    <script type="module" src="js/scripts.js"></script>
+</head>
+<body>
+    <form action="/" enctype="multipart/form-data" method="post" id="form">
+        <input type="file" name="file" id="file" class="form-control" aria-label="File Upload" multiple required>
+        <button type="submit" id="submit" class="btn btn-light">Upload</button>
+    </form>
+</body>
+</html>
