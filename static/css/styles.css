@@ -11,12 +11,11 @@ body {
 }
 
 #form {
-    width: 25%;
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-content: center;
+    align-items: stretch;
     gap: 1rem;
     margin: auto;
 }
