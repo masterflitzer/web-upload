@@ -8,13 +8,14 @@
     <link rel="icon" href="img/favicon.svg">
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/bootstrap-fix.css">
     <link rel="stylesheet" href="css/styles.css">
 
     <script type="module" src="js/main.js"></script>
 </head>
 <body>
-    <div id="alertContainer" class="position-fixed w-100 d-flex justify-content-center d-none">
-        <div class="d-flex gap-3 my-3 col-10 col-sm-9 col-md-8 col-lg-7 col-xl-6 col-xxl-5 alert alert-light"
+    <div id="alertContainer" class="position-fixed w-100 d-flex flex-row justify-content-center d-none">
+        <div class="d-flex flex-row gap-3 my-3 col-10 col-sm-9 col-md-8 col-lg-7 col-xl-6 col-xxl-5 alert alert-light"
              role="alert">
             <i class="bi bi-info-circle"></i>
             <span id="alertMessage"></span>
@@ -24,7 +25,9 @@
           class="d-flex flex-column justify-content-center align-items-stretch gap-3 m-auto h-100 col-10 col-sm-9 col-md-8 col-lg-7 col-xl-6 col-xxl-5">
         <h1 class="display-3 text-center">Web Upload</h1>
         <input type="file" name="files" id="files" class="form-control" aria-label="File Upload" multiple required>
-        <button type="submit" class="btn btn-light">Upload</button>
+        <button type="submit" id="submit" class="d-flex flex-row justify-content-center gap-3 btn btn-light">
+            <span>Upload</span>
+        </button>
     </form>
 </body>
 </html>

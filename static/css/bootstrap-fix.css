@@ -1,0 +1,33 @@
+.bg-white .form-control:focus {
+    border-color: var(--bs-gray-400) !important;
+    box-shadow: 0 0 0 0.25rem rgb(211, 212, 213, 50%) !important;
+}
+
+.bg-black .form-control:focus {
+    border-color: var(--bs-gray-600) !important;
+    box-shadow: 0 0 0 0.25rem rgb(66, 70, 73, 50%) !important;
+}
+
+.bg-black .form-control,
+.bg-black .input-group-text {
+    color: var(--bs-light) !important;
+    background-color: var(--bs-dark) !important;
+    border-color: var(--bs-gray-600) !important;
+}
+
+.bg-black input[type="file"].form-control::file-selector-button {
+    color: var(--bs-light) !important;
+    background-color: var(--bs-gray-800) !important;
+}
+
+.alert-light {
+    color: var(--bs-dark) !important;
+    background-color: var(--bs-light) !important;
+    border-color: var(--bs-light) !important;
+}
+
+.alert-dark {
+    color: var(--bs-light) !important;
+    background-color: var(--bs-dark) !important;
+    border-color: var(--bs-dark) !important;
+}

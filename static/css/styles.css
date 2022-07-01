@@ -8,28 +8,49 @@ body {
     height: 100vh;
     min-height: 100vh;
     max-height: 100vh;
+    font-size: 16px;
 }
 
-.bg-black .form-control,
-.bg-black .input-group-text {
-    color: var(--bs-light) !important;
-    background-color: var(--bs-dark) !important;
-    border-color: var(--bs-gray-600) !important;
+.dots-animation {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    place-content: center;
+    place-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem;
 }
 
-.bg-black input[type="file"].form-control::file-selector-button {
-    color: var(--bs-light) !important;
-    background-color: var(--bs-gray-800) !important;
+.dots-animation span {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background-color: var(--bs-gray-500);
+    color: var(--bs-gray-500);
+    animation-name: dots-animation;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-delay: 0s;
+    animation-iteration-count: infinite;
 }
 
-.alert-light {
-    color: var(--bs-dark) !important;
-    background-color: var(--bs-light) !important;
-    border-color: var(--bs-light) !important;
+.dots-animation span:first-child {
+    animation-delay: -0.1s;
 }
 
-.alert-dark {
-    color: var(--bs-light) !important;
-    background-color: var(--bs-dark) !important;
-    border-color: var(--bs-dark) !important;
+.dots-animation span:last-child {
+    animation-delay: 0.1s;
+}
+
+@keyframes dots-animation {
+    0%,
+    60%,
+    100% {
+        transform: initial;
+    }
+
+    30% {
+        transform: translateY(-0.75rem);
+    }
 }
