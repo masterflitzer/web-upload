@@ -10,12 +10,26 @@ body {
     max-height: 100vh;
 }
 
-#form {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: stretch;
-    gap: 1rem;
-    margin: auto;
+.bg-black .form-control,
+.bg-black .input-group-text {
+    color: var(--bs-light) !important;
+    background-color: var(--bs-dark) !important;
+    border-color: var(--bs-gray-600) !important;
+}
+
+.bg-black input[type="file"].form-control::file-selector-button {
+    color: var(--bs-light) !important;
+    background-color: var(--bs-gray-800) !important;
+}
+
+.alert-light {
+    color: var(--bs-dark) !important;
+    background-color: var(--bs-light) !important;
+    border-color: var(--bs-light) !important;
+}
+
+.alert-dark {
+    color: var(--bs-light) !important;
+    background-color: var(--bs-dark) !important;
+    border-color: var(--bs-dark) !important;
 }

@@ -4,7 +4,7 @@ import {
     send,
     Status,
 } from "https://deno.land/x/oak@v10.4.0/mod.ts";
-import { move } from "https://deno.land/std@0.145.0/fs/mod.ts";
+import { emptyDir, move } from "https://deno.land/std@0.145.0/fs/mod.ts";
 
 function getDirname(url: string) {
     let path = new URL(url).pathname;
@@ -24,6 +24,7 @@ const tmpDir = `${dirname}/tmp`;
 const router = new Router();
 
 router.post("/", async (ctx) => {
+    let success: boolean | null = null;
     try {
         const body = ctx.request.body();
         if (body.type === "form-data") {
@@ -33,19 +34,33 @@ router.post("/", async (ctx) => {
                 maxSize: 0,
                 outPath: tmpDir,
             });
-            formData.files?.forEach((file) => {
+
+            if (formData.files == null || formData.files.length === 0)
+                throw new Error("No files received");
+            for (const file of formData.files) {
                 if (file.filename != null) {
-                    move(file.filename, `${destination}/${file.originalName}`, {
-                        overwrite: true,
-                    });
+                    await move(
+                        file.filename,
+                        `${destination}/${file.originalName}`,
+                        {
+                            overwrite: true,
+                        }
+                    );
                 }
-            });
+            }
+
+            success = true;
         }
     } catch (e) {
         console.error(e);
+        success = false;
     } finally {
         ctx.response.status = Status.SeeOther;
-        ctx.response.redirect("/");
+        ctx.response.body = JSON.stringify({
+            success,
+        });
+
+        await emptyDir(tmpDir);
     }
 });
 
