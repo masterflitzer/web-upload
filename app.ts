@@ -44,6 +44,7 @@ router.post("/", async (ctx) => {
 
             if (formData.files == null || formData.files.length === 0)
                 throw new Error("No files received");
+
             for (const file of formData.files) {
                 if (file.filename != null) {
                     await move(
@@ -53,6 +54,7 @@ router.post("/", async (ctx) => {
                             overwrite: true,
                         }
                     );
+                    console.info(`Uploaded ${file.originalName}`);
                 }
             }
 
