@@ -45,23 +45,29 @@ form?.addEventListener("submit", async (event) => {
     submitButton.append(animation);
 
     const formData = new FormData(form);
-    const response = await fetch("/", {
+    const response = await fetch(globalThis.location.href, {
         method: "post",
         body: formData,
     });
-    const json = await response.json();
+
+    const status = response.status.toString();
+    if (status.startsWith("4") || status.startsWith("5")) {
+        alertMessage.textContent = "An unexpected error occurred!";
+    } else {
+        const json = await response.json();
+
+        if (json.success) {
+            alertMessage.textContent = "File(s) uploaded successfully!";
+        } else {
+            alertMessage.textContent = "File upload failed!";
+        }
+    }
 
     fileInput.value = "";
     fileInput.focus();
 
     animation.remove();
     toggleChildrenDisplay(submitButton, true);
-
-    if (json.success) {
-        alertMessage.textContent = "File(s) uploaded successfully!";
-    } else {
-        alertMessage.textContent = "File upload failed!";
-    }
 
     alertContainer.classList.remove("d-none");
     setTimeout(() => {
