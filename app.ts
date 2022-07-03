@@ -4,7 +4,11 @@ import {
     send,
     Status,
 } from "https://deno.land/x/oak@v10.4.0/mod.ts";
-import { emptyDir, move } from "https://deno.land/std@0.145.0/fs/mod.ts";
+import {
+    emptyDir,
+    ensureDir,
+    move,
+} from "https://deno.land/std@0.145.0/fs/mod.ts";
 
 function getDirname(url: string) {
     let path = new URL(url).pathname;
@@ -17,9 +21,12 @@ const port = 8080;
 const maxUploadFileSize = 128000000000; // in bytes
 
 const dirname = getDirname(import.meta.url);
-const uploadDir = `${dirname}/uploads`;
-const staticDir = `${dirname}/static`;
-const tmpDir = `${dirname}/tmp`;
+const dir = {
+    upload: `${dirname}/uploads`,
+    static: `${dirname}/static`,
+    tmp: `${dirname}/tmp`,
+};
+Object.values(dir).forEach((x) => ensureDir(x));
 
 const router = new Router();
 
@@ -28,11 +35,11 @@ router.post("/", async (ctx) => {
     try {
         const body = ctx.request.body();
         if (body.type === "form-data") {
-            const destination = uploadDir;
+            const destination = dir.upload;
             const formData = await body.value.read({
                 maxFileSize: maxUploadFileSize,
                 maxSize: 0,
-                outPath: tmpDir,
+                outPath: dir.tmp,
             });
 
             if (formData.files == null || formData.files.length === 0)
@@ -60,7 +67,7 @@ router.post("/", async (ctx) => {
             success,
         });
 
-        await emptyDir(tmpDir);
+        await emptyDir(dir.tmp);
     }
 });
 
@@ -72,7 +79,7 @@ app.use(router.allowedMethods());
 app.use(async (ctx, next) => {
     try {
         await send(ctx, ctx.request.url.pathname, {
-            root: staticDir,
+            root: dir.static,
             index: "index.html",
         });
     } catch (e) {
