@@ -1,0 +1,24 @@
+{
+  "name": "web-upload",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start-node": "npx tsc && node app.js",
+    "start-deno": "deno run --no-prompt --allow-env --allow-sys=uid --allow-net=localhost:8080 --allow-read=. --allow-write=tmp,uploads app.ts"
+  },
+  "license": "Apache-2.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "koa": "^2.14.2",
+    "koa-json": "^2.0.2",
+    "koa-router": "^12.0.0"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.13.8",
+    "@types/koa-json": "^2.0.20",
+    "@types/koa-router": "^7.4.4",
+    "@types/node": "^20.4.2",
+    "typescript": "^5.1.6"
+  }
+}
