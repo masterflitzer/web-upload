@@ -1,7 +1,0 @@
-{
-  "deno.enable": true,
-  "deno.lint": true,
-  "files.exclude": {
-    "static/": true
-  }
-}
