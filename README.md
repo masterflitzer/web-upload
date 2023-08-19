@@ -1,12 +1,16 @@
 # Web Upload
 
-## Prerequisites
+## Usage
 
--   [Deno](https://deno.land/#installation)
--   [Denon](https://github.com/denosaurs/denon#install)
+### Deno
 
-## Run
-
+```sh
+deno task start-deno
 ```
-denon start # available under http://localhost:8080/
+
+### NodeJS
+
+```sh
+npm i
+npm run start-node
 ```
