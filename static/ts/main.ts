@@ -51,16 +51,20 @@ form?.addEventListener("submit", async (event) => {
     });
 
     const status = response.status.toString();
-    if (status.startsWith("4") || status.startsWith("5")) {
-        alertMessage.textContent = "An unexpected error occurred!";
-    } else {
-        const json = await response.json();
+    try {
+        if (status.startsWith("5")) {
+            throw new Error();
+        }
 
-        if (json.success) {
+        const data = await response.json();
+
+        if (data.success) {
             alertMessage.textContent = "File(s) uploaded successfully!";
         } else {
-            alertMessage.textContent = "File upload failed!";
+            alertMessage.textContent = "File upload(s) failed!";
         }
+    } catch (error) {
+        alertMessage.textContent = "An unexpected error occurred!";
     }
 
     fileInput.value = "";
