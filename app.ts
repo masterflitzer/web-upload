@@ -1,14 +1,10 @@
-import {
-    Application,
-    Router,
-    send,
-    Status,
-} from "https://deno.land/x/oak@v10.4.0/mod.ts";
-import {
-    emptyDir,
-    ensureDir,
-    move,
-} from "https://deno.land/std@0.145.0/fs/mod.ts";
+import { mkdir, rename, rm } from "node:fs/promises";
+
+import config from "./config.json" assert { type: "json" };
+import Koa, { Context, Next } from "koa";
+import Multer from "@koa/multer";
+import Router from "@koa/router";
+import send from "koa-send";
 
 function getDirname(url: string) {
     let path = new URL(url).pathname;
@@ -17,84 +13,89 @@ function getDirname(url: string) {
     return path;
 }
 
-const port = 8080;
-const maxUploadFileSize = 128000000000; // in bytes
+function normalizeFileName(fileName: string) {
+    return fileName.replaceAll(/[^0-9a-zA-Z-.]/g, "-").toLowerCase();
+}
+
+const maxUploadFileSize = config.maxUploadFileSize; // in bytes
 
 const dirname = getDirname(import.meta.url);
 const dir = {
-    upload: `${dirname}/uploads`,
-    static: `${dirname}/static`,
     tmp: `${dirname}/tmp`,
+    upload: `${dirname}/uploads`,
 };
-Object.values(dir).forEach((x) => ensureDir(x));
+
+await rm(dir.tmp, { force: true, recursive: true });
+Object.values(dir).forEach(async (x) => await mkdir(x, { recursive: true }));
 
 const router = new Router();
 
-router.post("/", async (ctx) => {
-    let success: boolean | null = null;
-    try {
-        const body = ctx.request.body();
-        if (body.type === "form-data") {
-            const destination = dir.upload;
-            const formData = await body.value.read({
-                maxFileSize: maxUploadFileSize,
-                maxSize: 0,
-                outPath: dir.tmp,
-            });
-
-            if (formData.files == null || formData.files.length === 0)
-                throw new Error("No files received");
-
-            for (const file of formData.files) {
-                if (file.filename != null) {
-                    await move(
-                        file.filename,
-                        `${destination}/${file.originalName}`,
-                        {
-                            overwrite: true,
-                        }
-                    );
-                    console.info(`Uploaded ${file.originalName}`);
-                }
-            }
-
-            success = true;
-        }
-    } catch (e) {
-        console.error(e);
-        success = false;
-    } finally {
-        ctx.response.status = Status.SeeOther;
-        ctx.response.body = JSON.stringify({
-            success,
-        });
-
-        await emptyDir(dir.tmp);
-    }
+const upload = Multer({
+    dest: dir.tmp,
+    limits: {
+        fileSize: maxUploadFileSize,
+    },
 });
 
-const app = new Application();
+router.post("/", upload.any(), async (ctx: Context) => {
+    if (!ctx.is("multipart/form-data")) {
+        ctx.status = 415;
+        ctx.body = {
+            success: false,
+        };
+        return;
+    }
+
+    if (ctx.files == null || ctx.files.length === 0) {
+        ctx.status = 400;
+        ctx.body = {
+            success: false,
+        };
+        return;
+    }
+
+    for (const file of ctx.request.files as Multer.File[]) {
+        if (file.filename != null) {
+            const normalizedName = normalizeFileName(file.originalname);
+            await rename(
+                `${dir.tmp}/${file.filename}`,
+                `${dir.upload}/${normalizedName}`
+            );
+            console.info(`Uploaded ${file.originalname} -> ${normalizedName}`);
+        }
+    }
+    ctx.status = 201;
+    ctx.body = {
+        success: true,
+    };
+});
+
+const app = new Koa();
+
+app.use(async (ctx: Context, next: Next) => {
+    try {
+        await next();
+    } catch (error) {
+        console.error(error);
+        ctx.status = 500;
+        ctx.body = "Internal Server Error";
+        return;
+    }
+});
 
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-app.use(async (ctx, next) => {
-    try {
-        await send(ctx, ctx.request.url.pathname, {
-            root: dir.static,
-            index: "index.html",
-        });
-    } catch (e) {
-        console.error(e);
-    } finally {
-        await next();
-    }
+app.use(async (ctx: Context) => {
+    await send(ctx, ctx.path, {
+        root: `${dirname}/static`,
+        index: "index.html",
+    });
 });
 
-app.addEventListener("listen", ({ secure, hostname, port }) => {
-    const protocol = secure ? "https" : "http";
-    const host = hostname === "0.0.0.0" ? "localhost" : hostname ?? "localhost";
-    console.info(`Listening on ${protocol}://${host}:${port}`);
-});
+const host = config.host ?? "localhost";
+const port = config.port ?? 8080;
 
-await app.listen({ port });
+app.listen(port, host, () =>
+    console.info(`Listening on http://${host}:${port}`)
+);
